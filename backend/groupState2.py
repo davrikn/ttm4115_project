@@ -48,7 +48,6 @@ task_started_from_assigned = {'source': ASSIGNED, 'trigger': START_TASK, 'target
 task_assigned_from_assigned = {'source': ASSIGNED, 'trigger': ASSIGN_TASK, 'target': ASSIGNED, 'effect': 'add_task(*)'}
 task_completed_from_assigned = {'source': ASSIGNED, 'trigger': COMPLETE_TASK, 'target': ASSIGNED}
 
-
 # Out from in progress
 task_complete_from_progress = {'source': IN_PROGRESS, 'trigger': COMPLETE_TASK, 'target': VALIDATE_PROGRESS, 'effect': 'complete_task(*)'}
 task_assigned_from_progress = {'source': IN_PROGRESS, 'trigger': ASSIGN_TASK, 'target': IN_PROGRESS, 'effect': 'add_task(*)'}
@@ -73,7 +72,7 @@ class GroupState2:
     def __init__(self, name: str, driver: Driver):
         self.name = name
         self.tasks = dict()
-        self.stm = Machine(name=name, transitions=[init_state, task_assigned_from_none, task_deleted_from_assigned, task_started_from_none, task_completed_from_none, task_deleted_from_assigned, task_started_from_assigned, task_assigned_from_assigned, task_completed_from_assigned,
+        self.stm = Machine(name=name, transitions=[init_state, task_assigned_from_none, task_deleted_from_none, task_started_from_none, task_completed_from_none, task_deleted_from_assigned, task_started_from_assigned, task_assigned_from_assigned, task_completed_from_assigned,
                                                    task_complete_from_progress, task_assigned_from_progress, task_deleted_from_progress, task_started_from_progress, no_task_in_progress, task_in_progress, task_assigned, no_task_assigned],
                            states=[no_tasks, assigned, validate_assigned, validate_progress, in_progress], obj=self)
         driver.add_machine(self.stm)
@@ -102,7 +101,7 @@ class GroupState2:
         self.tasks[task] = TaskStatus.COMPLETED
 
     def delete_task(self, task: str):
-        task = self.tasks[task]
+        self.tasks.pop(task)
 
 
     def completed_tasks(self):
@@ -122,7 +121,7 @@ class GroupState2:
     def assigned_tasks(self):
         i = 0
         for task in self.tasks.values():
-            if task == TaskStatus.ASSIGNED:
+            if task == TaskStatus.ASSIGNED or TaskStatus.IN_PROGRESS:
                 i += 1
         return i
 
