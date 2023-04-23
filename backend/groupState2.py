@@ -1,6 +1,6 @@
 from stmpy import Machine, Driver
 from time import sleep
-from enum import Enum
+from enum import IntEnum
 from functools import reduce
 
 ############################################################################################
@@ -63,7 +63,7 @@ task_assigned = {'source': VALIDATE_ASSIGNED, 'trigger': TASKS_ASSIGNED, 'target
 no_task_assigned = {'source': VALIDATE_ASSIGNED, 'trigger': TASKS_NOT_ASSIGNED, 'target': NO_TASKS}
 
 
-class TaskStatus(Enum):
+class TaskStatus(IntEnum):
     ASSIGNED = 1
     IN_PROGRESS = 2
     COMPLETED = 3
@@ -124,6 +124,9 @@ class GroupState2:
             if task == TaskStatus.ASSIGNED or TaskStatus.IN_PROGRESS:
                 i += 1
         return i
+
+    def state(self):
+        return self.tasks
 
     def __str__(self):
         return f"Group: {self.name}\nAssigned tasks: {self.assigned_tasks()}\nTasks in progress: {self.in_progress_tasks()}\nTasks complete: {self.completed_tasks()}"
