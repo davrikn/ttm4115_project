@@ -2,7 +2,7 @@ from stmpy import Driver
 from flask import Flask, request
 import paho.mqtt.client as mqtt
 from MqttClient import get
-from groupState import GroupState, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK
+from groupState import GroupState, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK, TaskStatus
 from helpQueueState import HelpQueueState, REQUEST_HELP, FINISH_HELP, START_HELP
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from os import environ
@@ -55,12 +55,12 @@ def get_groups():
 
 @app.route("/groups/<groupname>", methods=["GET"])
 def get_group_state(groupname):
-    if groupname in groups.keys():
-        # Taskstate enum: 1 = Assigned, 2 = In progress, 3 = Complete
-        # {"taskname": TaskState enum}
-        return groups[groupname].state()
-    else:
+    if groupname not in groups.keys():
         return f"Group {groupname} not found", 404
+
+    # Taskstate enum: 1 = Assigned, 2 = In progress, 3 = Complete
+    # {"taskname": TaskState enum}
+    return groups[groupname].state()
 
 
 @app.route("/groups/<groupname>/tasks/<taskname>/start", methods=["GET"])
@@ -75,6 +75,8 @@ def start_task(groupname, taskname):
         return f"Task {taskname} not found", 404
     if username not in groups[groupname].members:
         return f"User {username} is not a member of group {groupname}", 403
+    if groups[groupname].tasks[taskname] != TaskStatus.ASSIGNED:
+        return f"Cannot start task that isn't assigned", 409
 
     driver.send(START_TASK, groupname, [taskname])
     client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
@@ -93,6 +95,8 @@ def finish_task(groupname, taskname):
         return f"Task {taskname} not found", 404
     if username not in groups[groupname].members:
         return f"User {username} is not a member of group {groupname}", 403
+    if groups[groupname].tasks[taskname] != TaskStatus.IN_PROGRESS:
+        return f"Cannot complete task that isn't in progress", 409
 
     driver.send(COMPLETE_TASK, groupname, [taskname])
     client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
