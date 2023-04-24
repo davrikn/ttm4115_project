@@ -1,10 +1,10 @@
 from stmpy import Driver
-from groupState2 import GroupState2, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK, TaskStatus, NO_TASKS, ASSIGNED, IN_PROGRESS
+from groupState import GroupState, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK, TaskStatus, NO_TASKS, ASSIGNED, IN_PROGRESS
 from time import sleep
 
 driver = Driver()
 groupname = "test"
-g = GroupState2(groupname, driver)
+g = GroupState(groupname, driver)
 driver.start()
 
 task = "t1"

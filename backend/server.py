@@ -2,7 +2,7 @@ from stmpy import Driver
 from flask import Flask, request
 import paho.mqtt.client as mqtt
 from MqttClient import get
-from groupState2 import GroupState2, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK
+from groupState import GroupState, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK
 from helpQueueState import HelpQueueState, REQUEST_HELP, FINISH_HELP, START_HELP
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from os import environ
@@ -19,7 +19,7 @@ queue = HelpQueueState(driver)
 client = get()
 
 groups = dict()
-tasks = dict()
+tasks = {"T1": "Example task"}
 users = {
     "David": {"password": "David123!"},
     "Ola": {"password": "Ola123!"},
@@ -28,6 +28,7 @@ users = {
     "Sander": {"password": "Sander123!"},
     "Admin": {"password": "Admin123!", "claim": "admin"}
 }
+
 
 def handle_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
     pass
@@ -173,7 +174,7 @@ def create_group():
     if groupname == "Helpqueue":
         return "Groupname Helpqueue is not allowed", 400
     client.client.publish("groupCreated", str({"groupname": groupname}))
-    group = GroupState2(groupname, driver)
+    group = GroupState(groupname, driver)
     groups[groupname] = group
     for task in tasks.keys():
         driver.send(ASSIGN_TASK, ASSIGN_TASK, [task])
