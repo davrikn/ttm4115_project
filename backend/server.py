@@ -10,7 +10,7 @@ from flask_cors import CORS
 environ['host'] = "wirelogger.com"
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 app.config["JWT_SECRET_KEY"] = "SomeBigSecret"
 jwt = JWTManager(app)
 
