@@ -2,9 +2,9 @@ import paho.mqtt.client as mqtt
 from time import sleep
 import json
 from typing import Callable, Any, TypeVar
+from os import environ
 
 Instance = TypeVar("MqttClient", bound="MqttClient")
-
 
 def get():
     if MqttClient.instance is None:
@@ -19,7 +19,7 @@ class MqttClient():
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.default_on_message
-        self.client.connect("wirelogger.com")
+        self.client.connect(environ["host"])
         self.client.subscribe('#')
         self.client.loop_start()
 

@@ -3,12 +3,11 @@ from flask import Flask, request
 import paho.mqtt.client as mqtt
 from MqttClient import get
 from groupState2 import GroupState2, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK
-import json
 from helpQueueState import HelpQueueState, REQUEST_HELP, FINISH_HELP, START_HELP
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from os import environ
 
-
-host = "wirelogger.com"
+environ['host'] = "wirelogger.com"
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "SomeBigSecret"
@@ -48,10 +47,12 @@ def login():
     token = create_access_token({"username": uname, "claim": user.get("claim") or "user"})
     return {"access_token": token}
 
+
 @app.route("/groups", methods=["GET"])
 def get_groups():
     # ["groupname"]
     return list(groups.keys())
+
 
 @app.route("/groups/<groupname>", methods=["GET"])
 def get_group_state(groupname):
@@ -61,6 +62,7 @@ def get_group_state(groupname):
         return groups[groupname].state()
     else:
         return f"Group {groupname} not found", 404
+
 
 @app.route("/groups/<groupname>/tasks/<taskname>/start", methods=["GET"])
 @jwt_required()
@@ -74,9 +76,11 @@ def start_task(groupname, taskname):
         return f"Task {taskname} not found", 404
     if username not in groups[groupname].members:
         return f"User {username} is not a member of group {groupname}", 403
+
     driver.send(START_TASK, groupname, [taskname])
     client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
     return "Task started", 200
+
 
 @app.route("/groups/<groupname>/tasks/<taskname>/finish", methods=["GET"])
 @jwt_required()
@@ -90,30 +94,36 @@ def finish_task(groupname, taskname):
         return f"Task {taskname} not found", 404
     if username not in groups[groupname].members:
         return f"User {username} is not a member of group {groupname}", 403
+
     driver.send(COMPLETE_TASK, groupname, [taskname])
     client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
     return "Task finished", 200
+
 
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
     # {"taskname": "taskdescription"}
     return tasks
 
+
 @app.route('/help', methods=["GET"])
 def get_queue():
     # {"receiving": string[], "awaiting": string[]}
     return queue.state()
+
 
 @app.route('/help/request', methods=["POST"])
 @jwt_required()
 def request_help():
     groupname = request.json.get('groupname')
     identity = get_jwt_identity()
+
     uname = identity['username']
     if groups.get(groupname) is None:
         return f"Group {groupname} not found", 404
     if uname not in groups[groupname].members:
         return f"User {uname} is not in group {groupname}", 403
+
     driver.send(REQUEST_HELP, 'Helpqueue', [groupname])
     client.client.publish('help/status', str(queue.state()))
     return f"You are {len(queue.in_help)} in line"
@@ -124,9 +134,9 @@ def request_help():
 def start_help():
     groupname = request.json.get('groupname')
     identity = get_jwt_identity()
+
     if identity['claim'] != 'admin':
         return f"User can not update helpqueue", 403
-
     if groupname not in queue.queue:
         return f"Group {groupname} has not requested help", 400
 
@@ -169,6 +179,7 @@ def create_group():
         driver.send(ASSIGN_TASK, ASSIGN_TASK, [task])
     return f"Group {groupname} successfully created", 200
 
+
 @app.route("/groups/<groupname>/members", methods=["POST"])
 @jwt_required()
 def add_groupmember(groupname):
@@ -200,6 +211,7 @@ def remove_groupmember(groupname):
     groups[groupname].remove_member(uname)
     return f"User {uname} successfully removed from group {groupname}", 200
 
+
 @app.route("/tasks", methods=["POST"])
 @jwt_required()
 def add_task():
@@ -210,6 +222,7 @@ def add_task():
     if taskname in tasks.keys():
         return f"Task {taskname} already exists", 409
     tasks[taskname] = task
+
     for group in groups.keys():
         driver.send(ASSIGN_TASK, group, [taskname])
     return f"Task {taskname} added"
