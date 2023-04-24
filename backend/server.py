@@ -5,10 +5,14 @@ from MqttClient import get
 from groupState2 import GroupState2, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK
 import json
 from helpQueueState import HelpQueueState
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+
 
 host = "wirelogger.com"
 
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = "SomeBigSecret"
+jwt = JWTManager(app)
 
 driver = Driver()
 driver.start(keep_active=True)
@@ -16,6 +20,14 @@ client = get()
 
 groups = dict()
 tasks = dict()
+users = {
+    "David": {"password": "David123!"},
+    "Ola": {"password": "Ola123!"},
+    "Emil": {"password": "Emil123!"},
+    "Helene": {"password": "Helene123!"},
+    "Sander": {"password": "Sander123!"},
+    "Admin": {"password": "Admin123!", "claim": "admin"}
+}
 
 def handle_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
     topic_parts = message.topic.split('/')
@@ -79,23 +91,31 @@ def handle_create_group(payload):
         driver.send(ASSIGN_TASK, ASSIGN_TASK, [task])
 
 
-@app.route("/groups")
+@app.route("/login", methods=["POST"])
+def login():
+    uname = request.json.get("username")
+    password = request.json.get("password")
+
+    user = users.get(uname)
+    if user is None:
+        return f"User {uname} not found", 404
+    if password != user["password"]:
+        return f"Wrong password", 401
+
+    token = create_access_token({"username": uname, "claim": user.get("claim") or "user"})
+    return {"access_token": token}
+
+@app.route("/groups", methods=["GET"])
 def get_groups():
     return list(groups.keys())
 
-@app.route("/groups/<groupname>")
+@app.route("/groups/<groupname>", methods=["GET"])
 def get_group_state(groupname):
     return groups[groupname].state()
 
-@app.route("/tasks")
+@app.route("/tasks", methods=["GET"])
 def get_tasks():
     return tasks
-
-@app.route("/shutdown")
-def shutdown():
-    driver.stop()
-    exit(0)
-
 
 
 client.set_on_message(handle_message)
