@@ -1,28 +1,36 @@
-<!-- Heavily inspired from https://svelte.dev/repl/b225504c9fea44b189ed5bfb566df6e6?version=3.58.0-->
+<!-- Heavily inspired and copied from https://svelte.dev/repl/b225504c9fea44b189ed5bfb566df6e6?version=3.58.0-->
 <script>
 	// Inspired by https://svelte.dev/repl/810b0f1e16ac4bbd8af8ba25d5e0deff?version=3.4.2.
 	import { flip } from 'svelte/animate';
-	export let tasks;
+	let tasks = {
+		"taskname": 1,
+		"taskname 2": 2
+	}
 
 	let categories = [
 		{
-			name: 'NOT STARTED',
-			items: ['task1', 'task2', 'task3']
+			name: 'ASSIGNED',
+			items: [],
+			status: 1
 		},
 		{
 			name: 'IN PROGRESS',
-			items: ['task4']
+			items: [],
+			status: 2
 		},
 		{
-			name: 'DONE',
-			items: ['task5']
+			name: 'COMPLETED',
+			items: [],
+			status: 3
 		}
 	];
 
-	for (let category in categories) {
-		for (let task in tasks) {
-			if (task.status === category.name) {
-				category.items.push(task);
+	for (let category of categories) {
+		console.log({category})
+		for (const [taskname, status] of Object.entries(tasks)) {
+			console.log(taskname, status, category)
+			if (status === category.status) {
+				category.items.push(taskname);
 			}
 		}
 	}
