@@ -1,13 +1,11 @@
 <script>
 import NavBar from "$lib/NavBar.svelte";
 </script>
+
 <NavBar />
 <slot />
 
-
-
 <style>
-
     :global(html) {
         font-family: Arial, serif;
         padding: 0;
