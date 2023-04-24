@@ -63,21 +63,33 @@ def get_group_state(groupname):
         return f"Group {groupname} not found", 404
 
 @app.route("/groups/<groupname>/tasks/<taskname>/start", methods=["GET"])
+@jwt_required()
 def start_task(groupname, taskname):
+    identity = get_jwt_identity()
+    username = identity["username"]
+
     if groupname not in groups.keys():
         return f"Group {groupname} not found", 404
     if taskname not in tasks.keys():
         return f"Task {taskname} not found", 404
+    if username not in groups[groupname].members:
+        return f"User {username} is not a member of group {groupname}", 403
     driver.send(START_TASK, groupname, [taskname])
     client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
     return "Task started", 200
 
 @app.route("/groups/<groupname>/tasks/<taskname>/finish", methods=["GET"])
+@jwt_required()
 def finish_task(groupname, taskname):
+    identity = get_jwt_identity()
+    username = identity["username"]
+
     if groupname not in groups.keys():
         return f"Group {groupname} not found", 404
     if taskname not in tasks.keys():
         return f"Task {taskname} not found", 404
+    if username not in groups[groupname].members:
+        return f"User {username} is not a member of group {groupname}", 403
     driver.send(COMPLETE_TASK, groupname, [taskname])
     client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
     return "Task finished", 200
