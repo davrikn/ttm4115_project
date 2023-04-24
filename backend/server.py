@@ -51,9 +51,7 @@ def login():
 
 @app.route("/groups", methods=["GET"])
 def get_groups():
-    # ["groupname"]
-    return list(groups.keys())
-
+    return {name: group.state() for (name, group) in groups.items()}
 
 @app.route("/groups/<groupname>", methods=["GET"])
 def get_group_state(groupname):
