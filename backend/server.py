@@ -74,6 +74,7 @@ def login():
 
 @app.route("/groups", methods=["GET"])
 def get_groups():
+    # ["groupname"]
     return list(groups.keys())
 
 @app.route("/groups/<groupname>", methods=["GET"])
@@ -85,10 +86,12 @@ def get_group_state(groupname):
 
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
+    # {"taskname": "taskdescription"}
     return tasks
 
 @app.route('/help', methods=["GET"])
 def get_queue():
+    # {"receiving": string[], "awaiting": string[]}
     return queue.state()
 
 @app.route('/help/request', methods=["POST"])
