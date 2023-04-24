@@ -1,7 +1,10 @@
 <script>
 	import jwt_token from '$lib/token.js';
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	let username;
 	let password;
+	$: loggedIn = false;
 	function login() {
 		fetch('http://localhost:3000/login', {
 			method: 'POST',
@@ -23,10 +26,12 @@
 					// headers: {
 					//     Authorization: `Bearer ${localStorage.getItem("jwt_token")}`
 					// },
+					goto('/');
 				}
-				console.log(localStorage.getItem('jwt_token'));
 			})
-			.catch((err) => alert(err));
+			.catch((err) => {
+				alert(err);
+			});
 	}
 </script>
 
