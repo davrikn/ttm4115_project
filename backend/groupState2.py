@@ -76,6 +76,15 @@ class GroupState2:
                                                    task_complete_from_progress, task_assigned_from_progress, task_deleted_from_progress, task_started_from_progress, no_task_in_progress, task_in_progress, task_assigned, no_task_assigned],
                            states=[no_tasks, assigned, validate_assigned, validate_progress, in_progress], obj=self)
         driver.add_machine(self.stm)
+        self.members = []
+
+    def add_member(self, uname: str):
+        if uname not in self.members:
+            self.members.append(uname)
+
+    def remove_member(self, uname: str):
+        if uname in self.members:
+            self.members.remove(uname)
 
     def validate_assigned(self):
         for task in self.tasks.values():

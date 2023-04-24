@@ -16,6 +16,7 @@ jwt = JWTManager(app)
 
 driver = Driver()
 driver.start(keep_active=True)
+queue = HelpQueueState(driver)
 client = get()
 
 groups = dict()
@@ -34,12 +35,6 @@ def handle_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
 
     if topic_parts[0] == 'group':
         handle_group_messages(topic_parts[2], topic_parts[1], message.payload)
-    elif topic_parts[0] == 'createGroup':
-        handle_create_group(message.payload)
-    elif topic_parts[0] == 'newTask':
-        handle_new_task(message.payload)
-    elif topic_parts[0] == 'deleteTask':
-        handle_delete_task(message.payload)
     elif topic_parts[0] == 'help':
         handle_help(topic_parts[1], message.payload)
 
@@ -51,44 +46,15 @@ def handle_help(group, payload):
 def handle_group_messages(event, group, payload):
     if groups.get(group) is None:
         return
-    payload = json.loads(payload)
-    taskname = payload['task']
 
     if event == "startTask":
+        payload = json.loads(payload)
+        taskname = payload['task']
         driver.send(START_TASK, group, [taskname])
     elif event == 'finishTask':
+        payload = json.loads(payload)
+        taskname = payload['task']
         driver.send(COMPLETE_TASK, group, [taskname])
-
-
-def handle_delete_task(payload):
-    payload = json.loads(payload)
-    taskname = payload["taskname"]
-    if not taskname in tasks.keys():
-        return
-    tasks.pop(taskname)
-    for group in groups.keys():
-        driver.send(DELETE_TASK, group, [taskname])
-
-
-def handle_new_task(payload):
-    payload = json.loads(payload)
-    taskname, task = payload["taskname"], payload["task"]
-    if taskname in tasks.keys():
-        return
-    tasks[taskname] = task
-    for group in groups.keys():
-        driver.send(ASSIGN_TASK, group, [taskname])
-
-
-def handle_create_group(payload):
-    payload = json.loads(payload)
-    groupname = payload["groupname"]
-    if groupname in groups:
-        return
-    groupstate = GroupState2(groupname, driver)
-    groups[groupname] = groupstate
-    for task in tasks.keys():
-        driver.send(ASSIGN_TASK, ASSIGN_TASK, [task])
 
 
 @app.route("/login", methods=["POST"])
@@ -111,12 +77,88 @@ def get_groups():
 
 @app.route("/groups/<groupname>", methods=["GET"])
 def get_group_state(groupname):
-    return groups[groupname].state()
+    if groupname in groups.keys():
+        return groups[groupname].state()
+    else:
+        return f"Group {groupname} not found", 404
 
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
     return tasks
 
+@app.route("/groups", methods=["POST"])
+@jwt_required()
+def create_group():
+    identity = get_jwt_identity()
+    if identity["claim"] != "admin":
+        return f"User does not have the right to create groups", 403
+    groupname = request.json.get("groupname")
+    if groupname in groups.keys():
+        return "Group already exists", 400
+    if groupname == "Helpqueue":
+        return "Groupname Helpqueue is not allowed", 400
+    client.client.publish("groupCreated", str({"groupname": groupname}))
+    group = GroupState2(groupname, driver)
+    groups[groupname] = group
+    for task in tasks.keys():
+        driver.send(ASSIGN_TASK, ASSIGN_TASK, [task])
+    return f"Group {groupname} successfully created", 200
+
+@app.route("/groups/<groupname>/members", methods=["POST"])
+@jwt_required()
+def add_groupmember(groupname):
+    identity = get_jwt_identity()
+    if identity["claim"] != "admin":
+        return f"User does not have the right to add members to groups", 403
+
+    uname = request.json.get("username")
+    if uname not in users.keys():
+        return f"User {uname} not found", 404
+    if groupname not in groups.keys():
+        return f"Group {groupname} not found", 404
+    groups[groupname].add_member(uname)
+    return f"User {uname} successfully added to group {groupname}", 200
+
+
+@app.route("/groups/<groupname>/members", methods=["DELETE"])
+@jwt_required()
+def remove_groupmember(groupname):
+    identity = get_jwt_identity()
+    if identity["claim"] != "admin":
+        return f"User does not have the right to remove members from groups", 403
+
+    uname = request.json.get("username")
+    if uname not in users.keys():
+        return f"User {uname} not found", 404
+    if groupname not in groups.keys():
+        return f"Group {groupname} not found", 404
+    groups[groupname].remove_member(uname)
+    return f"User {uname} successfully removed from group {groupname}", 200
+
+@app.route("/tasks", methods=["POST"])
+@jwt_required()
+def add_task():
+    identity = get_jwt_identity()
+    if identity["claim"] != "admin":
+        return f"User does not have the right to create groups", 403
+    taskname, task = request.json.get("taskname"), request.json.get("task")
+    if taskname in tasks.keys():
+        return
+    tasks[taskname] = task
+    for group in groups.keys():
+        driver.send(ASSIGN_TASK, group, [taskname])
+
+@app.route("/tasks/<taskname>", methods=["DELETE"])
+@jwt_required()
+def remove_task(taskname):
+    identity = get_jwt_identity()
+    if identity["claim"] != "admin":
+        return f"User does not have the right to create groups", 403
+    if not taskname in tasks.keys():
+        return
+    tasks.pop(taskname)
+    for group in groups.keys():
+        driver.send(DELETE_TASK, group, [taskname])
 
 client.set_on_message(handle_message)
 app.run(port=3000)

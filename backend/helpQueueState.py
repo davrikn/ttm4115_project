@@ -9,17 +9,16 @@ finish_help = {'trigger': 'finish_help', 'source': 'helping', 'target': 'idle'}
 
 class HelpQueueState:
 
-    def __init__(self, client: mqtt_client.Client):
-        self.mqtt = client
+    def __init__(self, driver: Driver):
         self.stm = Machine("Helpqueue", [init_state, receive_request, next_help, finish_help], self)
         self.queue = []
+        driver.add_machine(self.stm)
 
     def enqueue(self, group: str):
         self.queue.append(group)
 
     def dequeue(self):
         self.queue.pop()
-        self.mqtt.publish('help/update', payload=str(self))
         if len(self.queue) == 0:
             self.stm.send('finish_help')
 
