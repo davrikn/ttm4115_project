@@ -6,10 +6,11 @@ from groupState import GroupState, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, STAR
 from helpQueueState import HelpQueueState, REQUEST_HELP, FINISH_HELP, START_HELP
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from os import environ
-
+from flask_cors import CORS
 environ['host'] = "wirelogger.com"
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 app.config["JWT_SECRET_KEY"] = "SomeBigSecret"
 jwt = JWTManager(app)
 
