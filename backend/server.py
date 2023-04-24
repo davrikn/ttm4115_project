@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 from MqttClient import get
 from groupState2 import GroupState2, ASSIGN_TASK, DELETE_TASK, COMPLETE_TASK, START_TASK
 import json
-from helpQueueState import HelpQueueState
+from helpQueueState import HelpQueueState, REQUEST_HELP, FINISH_HELP, START_HELP
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 
@@ -39,6 +39,7 @@ def handle_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         handle_help(topic_parts[1], message.payload)
 
 def handle_help(group, payload):
+
     # TODO: implement
     pass
 
@@ -85,6 +86,57 @@ def get_group_state(groupname):
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
     return tasks
+
+@app.route('/help', methods=["GET"])
+def get_queue():
+    return queue.state()
+
+@app.route('/help/request', methods=["POST"])
+@jwt_required()
+def request_help():
+    groupname = request.json.get('groupname')
+    identity = get_jwt_identity()
+    uname = identity['username']
+    if groups.get(groupname) is None:
+        return f"Group {groupname} not found", 404
+    if uname not in groups[groupname].members:
+        return f"User {uname} is not in group {groupname}", 403
+    driver.send(REQUEST_HELP, 'Helpqueue', [groupname])
+    client.client.publish('help/status', str(queue.state()))
+    return f"You are {len(queue.in_help) - 1} in line"
+
+
+@app.route('/help/start', methods=["POST"])
+@jwt_required()
+def start_help():
+    groupname = request.json.get('groupname')
+    identity = get_jwt_identity()
+    if identity['claim'] != 'admin':
+        return f"User can not update helpqueue", 403
+
+    if groupname not in queue.queue:
+        return f"Group {groupname} has not requested help", 400
+
+    driver.send(START_HELP, 'Helpqueue', [groupname])
+    client.client.publish('help/status', str(queue.state()))
+    return f"Help started for group {groupname}"
+
+
+@app.route('/help/finish', methods=["POST"])
+@jwt_required()
+def stop_help():
+    groupname = request.json.get('groupname')
+    identity = get_jwt_identity()
+    if identity['claim'] != 'admin':
+        return f"User can not update helpqueue", 403
+
+    if groupname not in queue.in_help:
+        return f"Group {groupname} is not currently being helped", 400
+
+    driver.send(FINISH_HELP, 'Helpqueue', [groupname])
+    client.client.publish('help/status', str(queue.state()))
+    return f"Help finished for group {groupname}"
+
 
 @app.route("/groups", methods=["POST"])
 @jwt_required()
@@ -143,10 +195,12 @@ def add_task():
         return f"User does not have the right to create groups", 403
     taskname, task = request.json.get("taskname"), request.json.get("task")
     if taskname in tasks.keys():
-        return
+        return f"Task {taskname} already exists", 409
     tasks[taskname] = task
     for group in groups.keys():
         driver.send(ASSIGN_TASK, group, [taskname])
+    return f"Task {taskname} added"
+
 
 @app.route("/tasks/<taskname>", methods=["DELETE"])
 @jwt_required()
@@ -159,6 +213,8 @@ def remove_task(taskname):
     tasks.pop(taskname)
     for group in groups.keys():
         driver.send(DELETE_TASK, group, [taskname])
+    return f"Task {taskname} removed"
+
 
 client.set_on_message(handle_message)
 app.run(port=3000)
