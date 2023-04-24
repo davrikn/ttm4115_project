@@ -31,31 +31,7 @@ users = {
 }
 
 def handle_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
-    topic_parts = message.topic.split('/')
-
-    if topic_parts[0] == 'group':
-        handle_group_messages(topic_parts[2], topic_parts[1], message.payload)
-    elif topic_parts[0] == 'help':
-        handle_help(topic_parts[1], message.payload)
-
-def handle_help(group, payload):
-
-    # TODO: implement
     pass
-
-
-def handle_group_messages(event, group, payload):
-    if groups.get(group) is None:
-        return
-
-    if event == "startTask":
-        payload = json.loads(payload)
-        taskname = payload['task']
-        driver.send(START_TASK, group, [taskname])
-    elif event == 'finishTask':
-        payload = json.loads(payload)
-        taskname = payload['task']
-        driver.send(COMPLETE_TASK, group, [taskname])
 
 
 @app.route("/login", methods=["POST"])
@@ -86,6 +62,26 @@ def get_group_state(groupname):
     else:
         return f"Group {groupname} not found", 404
 
+@app.route("/groups/<groupname>/tasks/<taskname>/start", methods=["GET"])
+def start_task(groupname, taskname):
+    if groupname not in groups.keys():
+        return f"Group {groupname} not found", 404
+    if taskname not in tasks.keys():
+        return f"Task {taskname} not found", 404
+    driver.send(START_TASK, groupname, [taskname])
+    client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
+    return "Task started", 200
+
+@app.route("/groups/<groupname>/tasks/<taskname>/finish", methods=["GET"])
+def finish_task(groupname, taskname):
+    if groupname not in groups.keys():
+        return f"Group {groupname} not found", 404
+    if taskname not in tasks.keys():
+        return f"Task {taskname} not found", 404
+    driver.send(COMPLETE_TASK, groupname, [taskname])
+    client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
+    return "Task finished", 200
+
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
     # {"taskname": "taskdescription"}
@@ -108,7 +104,7 @@ def request_help():
         return f"User {uname} is not in group {groupname}", 403
     driver.send(REQUEST_HELP, 'Helpqueue', [groupname])
     client.client.publish('help/status', str(queue.state()))
-    return f"You are {len(queue.in_help) - 1} in line"
+    return f"You are {len(queue.in_help)} in line"
 
 
 @app.route('/help/start', methods=["POST"])
