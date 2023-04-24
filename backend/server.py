@@ -80,6 +80,8 @@ def get_groups():
 @app.route("/groups/<groupname>", methods=["GET"])
 def get_group_state(groupname):
     if groupname in groups.keys():
+        # Taskstate enum: 1 = Assigned, 2 = In progress, 3 = Complete
+        # {"taskname": TaskState enum}
         return groups[groupname].state()
     else:
         return f"Group {groupname} not found", 404
