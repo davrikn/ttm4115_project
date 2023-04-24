@@ -2,7 +2,7 @@
 	export let name;
 </script>
 
-<button>Request help</button>
+<button>Request help {name}</button>
 
 <style>
 	button {
