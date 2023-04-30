@@ -14,7 +14,7 @@
 			<DeleteGroupButton name={data.slug} />
 		</div>
 	</div>
-	<TaskViewer groupname={data.slug} />
+	<TaskViewer tasks={data.tasks} groupname={data.slug} />
 </div>
 
 <style>

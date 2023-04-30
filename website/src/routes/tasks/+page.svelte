@@ -1,5 +1,4 @@
 <script>
-
     import CreateTask from "$lib/task/CreateTask.svelte";
     import TaskList from "$lib/task/TaskList.svelte";
 </script>
