@@ -1,8 +1,8 @@
 <script>
-    import NewGroup from '$lib/NewGroup.svelte';
+    import NewGroup from '$lib/group/NewGroup.svelte';
     import StatusBar from '$lib/StatusBar.svelte';
-    import HelpQueue from "$lib/HelpQueue.svelte";
-    import AllGroups from "$lib/AllGroups.svelte";
+    import HelpQueue from "$lib/help/HelpQueue.svelte";
+    import AllGroups from "$lib/group/AllGroups.svelte";
 </script>
 
 <slot/>

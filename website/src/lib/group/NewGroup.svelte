@@ -1,5 +1,5 @@
 <script>
-    import {updateGroups} from "$lib/group-utils.js";
+    import {updateGroups} from "$lib/group/group-utils.js";
 
     let groupname;
     async function createNewGroup() {

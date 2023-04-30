@@ -1,6 +1,6 @@
 <script>
-    import Group from '$lib/Group.svelte';
-    import {updateGroups} from "$lib/group-utils.js";
+    import Group from '$lib/group/Group.svelte';
+    import {updateGroups} from "$lib/group/group-utils.js";
     import {groupStore} from "$lib/stores.js";
     import {onMount} from "svelte";
 

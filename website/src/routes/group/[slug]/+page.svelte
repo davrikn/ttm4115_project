@@ -1,7 +1,7 @@
 <script>
-	import DeleteGroupButton from '$lib/DeleteGroupButton.svelte';
-	import TaskViewer from '$lib/TaskViewer.svelte';
-	import RequestHelpButton from '$lib/RequestHelpButton.svelte';
+	import DeleteGroupButton from '$lib/group/DeleteGroupButton.svelte';
+	import TaskViewer from '$lib/task/TaskViewer.svelte';
+	import RequestHelpButton from '$lib/help/RequestHelpButton.svelte';
 
 	export let data;
 </script>

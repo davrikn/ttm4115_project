@@ -1,5 +1,5 @@
 import {browser} from "$app/environment";
-import { groupStore } from "./stores";
+import { groupStore } from "../stores.js";
 
 async function fetchGroups() {
     if (browser) {
