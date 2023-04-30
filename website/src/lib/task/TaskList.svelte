@@ -2,13 +2,14 @@
     import {onMount} from "svelte";
     import {updateTasks} from "$lib/task/task-utils.js";
     import {taskStore} from "$lib/stores.js";
+    import Task from "$lib/task/Task.svelte";
 
     onMount(async () => updateTasks());
 </script>
 
 <div class="tasks">
     {#each $taskStore as task}
-        <p>{task.taskname}: {task.task}</p>
+        <Task task={task} />
     {:else}
         <h1>There is no tasks on the server.<br>
             Please create new tasks.</h1>
