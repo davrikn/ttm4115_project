@@ -1,6 +1,10 @@
 <script>
     let groupname;
     function createNewGroup() {
+        if (groupname === undefined || groupname === null || groupname === "") {
+            alert("Please enter a group name");
+            return;
+        }
         fetch('http://localhost:3000/groups', {
             method: 'POST',
             headers: {
@@ -19,17 +23,17 @@
     }
 </script>
 
-<div>
+<form>
 <label for="new-group">
     New group name:
 </label>
 <input bind:value={groupname} type="text" name="new-group" id="new-group">
 <button on:click={createNewGroup}>Create new group</button>
-</div>
+</form>
 
 <style>
 
-    div {
+    form {
         box-sizing: border-box;
         width: max-content;
         border: 5px solid darkgreen;
