@@ -7,11 +7,14 @@ from helpQueueState import HelpQueueState, REQUEST_HELP, FINISH_HELP, START_HELP
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from os import environ
 from flask_cors import CORS
+from datetime import timedelta
+
 environ['host'] = "wirelogger.com"
 
 app = Flask(__name__)
 CORS(app)
 app.config["JWT_SECRET_KEY"] = "SomeBigSecret"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 jwt = JWTManager(app)
 
 driver = Driver()
