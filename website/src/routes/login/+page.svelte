@@ -1,6 +1,5 @@
 <script>
 	import jwt_token from '$lib/token.js';
-	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	let username;
 	let password;
