@@ -1,38 +1,45 @@
 <script>
-import {updateGroups} from "$lib/group/group-utils.js";
+    import {updateTasks} from "$lib/task/task-utils.js";
 
-let taskname;
-async function createNewTask() {
-    if (taskname === undefined || taskname === null || taskname === "") {
-        alert("Please enter a taskname");
-        return;
+    let taskname;
+    let task;
+
+    async function createNewTask() {
+        if (taskname === undefined || taskname === null || taskname === "") {
+            alert("Please enter a taskname");
+            return;
+        }
+        await fetch('http://localhost:3000/tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwt_token")}`
+            },
+            body: JSON.stringify({
+                'taskname': taskname,
+                'task': task,
+            })
+        })
+            .then((response) => response.text())
+            .then((text) => {
+                alert(text)
+                updateTasks()
+            })
+            .catch((err) => {
+                alert(err);
+            });
     }
-    await fetch('http://localhost:3000/groups', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem("jwt_token")}`
-        },
-        body: JSON.stringify({
-            'taskname': taskname,
-        })
-    })
-        .then((response) => response.text())
-        .then((text) => {
-            alert(text)
-            updateGroups()
-        })
-        .catch((err) => {
-            alert(err);
-        });
-}
 </script>
 
 <form>
-    <label for="new-task">
+    <label for="taskname">
         New task name:
     </label>
-    <input bind:value={taskname} type="text" name="new-task" id="new-task">
+    <input bind:value={taskname} type="text" name="taskname" id="taskname">
+    <label for="task">
+        Task description:
+    </label>
+    <input bind:value={task} type="text" name="task" id="task">
     <button on:click={createNewTask}>Create new task</button>
 </form>
 
@@ -53,6 +60,7 @@ async function createNewTask() {
         gap: 1em;
         align-items: flex-start;
     }
+
     button {
         background-color: darkgreen; /* Green */
         border: black 2px solid;
