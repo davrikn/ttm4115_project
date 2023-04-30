@@ -2,7 +2,6 @@ import {browser} from "$app/environment";
 import {taskStore} from "$lib/stores.js";
 
 
-
 async function fetchTasks() {
     if (browser) {
         const res =
@@ -19,7 +18,7 @@ async function fetchTasks() {
             throw new Error(await res.text())
         }
 
-}
+    }
 }
 export async function updateTasks() {
     if (browser) {
