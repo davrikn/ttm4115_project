@@ -1,11 +1,13 @@
 <script>
+    import {updateGroups} from "$lib/group-utils.js";
+
     let groupname;
-    function createNewGroup() {
+    async function createNewGroup() {
         if (groupname === undefined || groupname === null || groupname === "") {
             alert("Please enter a group name");
             return;
         }
-        fetch('http://localhost:3000/groups', {
+        await fetch('http://localhost:3000/groups', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -16,7 +18,10 @@
             })
         })
             .then((response) => response.text())
-            .then((text) => alert(text))
+            .then((text) => {
+                alert(text)
+                updateGroups()
+            })
             .catch((err) => {
                 alert(err);
             });
