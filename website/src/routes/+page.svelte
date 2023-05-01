@@ -2,6 +2,10 @@
     import NewGroup from '$lib/group/NewGroup.svelte';
     import AllGroups from "$lib/group/AllGroups.svelte";
     import StatusBar from "$lib/StatusBar.svelte";
+
+    import { run } from "$lib/mqtt.js"
+
+    run()
 </script>
 
 <slot/>
