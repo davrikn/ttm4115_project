@@ -1,3 +1,5 @@
+import json
+
 from stmpy import Machine, Driver
 from time import sleep
 from enum import IntEnum
@@ -135,7 +137,7 @@ class GroupState:
         return i
 
     def state(self):
-        return {key: int(value) for key, value in self.tasks.items()}
+        return json.dumps({key: int(value) for key, value in self.tasks.items()})
 
     def __str__(self):
         return f"Group: {self.name}\nAssigned tasks: {self.assigned_tasks()}\nTasks in progress: {self.in_progress_tasks()}\nTasks complete: {self.completed_tasks()}"
