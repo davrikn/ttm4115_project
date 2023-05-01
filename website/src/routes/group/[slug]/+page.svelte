@@ -10,7 +10,7 @@
 	<div class="bar">
 		<h1>Group: {data.slug}</h1>
 		<div class="buttons">
-			<RequestHelpButton name={data.slug} />
+			<RequestHelpButton groupname={data.slug} />
 		</div>
 	</div>
 	<Members groupname={data.slug} groupmembers={data.groupmembers}/>

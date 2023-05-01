@@ -12,13 +12,13 @@
 
 <nav>
 	<a href="/">Home</a>
+	<a href="/tasks">Tasks</a>
+	<a href="/help">Help Queue</a>
 	{#if !$jwt_token}
 		<a href="/login">Login</a>
 	{:else}
 		<a on:click={logout}>Logout</a>
 	{/if}
-
-	<a href="/tasks">Tasks</a>
 </nav>
 
 <style>
