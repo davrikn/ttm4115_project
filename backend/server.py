@@ -65,7 +65,7 @@ def get_group_state(groupname):
 
     # Taskstate enum: 1 = Assigned, 2 = In progress, 3 = Complete
     # {"taskname": TaskState enum}
-    return groups[groupname].state()
+    return str(groups[groupname].state())
 
 
 @app.route("/groups/<groupname>/tasks/<taskname>/start", methods=["GET"])
@@ -185,11 +185,12 @@ def create_group():
         return "Group already exists", 400
     if groupname == "Helpqueue":
         return "Groupname Helpqueue is not allowed", 400
-    client.client.publish("groupCreated", str({"groupname": groupname}))
     group = GroupState(groupname, driver)
     groups[groupname] = group
     for task in tasks.keys():
         driver.send(ASSIGN_TASK, groupname, [task])
+    sleep(0.01)
+    client.client.publish("groupCreated", str({"groupname": groupname}))
     return f"Group {groupname} successfully created", 200
 
 @app.route("/groups/<groupname>/members", methods=["GET"])
