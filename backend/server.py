@@ -8,6 +8,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from os import environ
 from flask_cors import CORS
 from datetime import timedelta
+from time import sleep
 
 environ['host'] = "wirelogger.com"
 
@@ -83,6 +84,7 @@ def start_task(groupname, taskname):
         return f"Cannot start task that isn't assigned", 409
 
     driver.send(START_TASK, groupname, [taskname])
+    sleep(0.01)
     client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
     return "Task started", 200
 
@@ -103,6 +105,7 @@ def finish_task(groupname, taskname):
         return f"Cannot complete task that isn't in progress", 409
 
     driver.send(COMPLETE_TASK, groupname, [taskname])
+    sleep(0.01)
     client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
     return "Task finished", 200
 
@@ -132,6 +135,7 @@ def request_help():
         return f"User {uname} is not in group {groupname}", 403
 
     driver.send(REQUEST_HELP, 'Helpqueue', [groupname])
+    sleep(0.01)
     client.client.publish('help/status', str(queue.state()))
     return f"You are {len(queue.queue)} in line"
 
@@ -148,6 +152,7 @@ def start_help():
         return f"Group {groupname} has not requested help", 400
 
     driver.send(START_HELP, 'Helpqueue', [groupname])
+    sleep(0.01)
     client.client.publish('help/status', str(queue.state()))
     return f"Help started for group {groupname}"
 
@@ -164,6 +169,7 @@ def stop_help():
         return f"Group {groupname} is not currently being helped", 400
 
     driver.send(FINISH_HELP, 'Helpqueue', [groupname])
+    sleep(0.01)
     client.client.publish('help/status', str(queue.state()))
     return f"Help finished for group {groupname}"
 
@@ -238,6 +244,8 @@ def add_task():
 
     for group in groups.keys():
         driver.send(ASSIGN_TASK, group, [taskname])
+        sleep(0.001)
+        client.client.publish(f"groups/{group}/status", str(groups[group].status()))
     return f"Task {taskname} added"
 
 
@@ -252,6 +260,8 @@ def remove_task(taskname):
     tasks.pop(taskname)
     for group in groups.keys():
         driver.send(DELETE_TASK, group, [taskname])
+        sleep(0.001)
+        client.client.publish(f"groups/{group}/status", str(groups[group].status()))
     return f"Task {taskname} removed"
 
 
