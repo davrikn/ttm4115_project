@@ -78,3 +78,31 @@ export function updateTaskStatus(groupname, taskname, status) {
             break;
     }
 }
+
+export async function updateGroupTasks(groupname) {
+    if (browser) {
+        const tasksJSON = await fetchGroupTasks(groupname)
+        const tasks = []
+        for (const [taskname, status] of Object.entries(tasksJSON)) {
+            tasks.push({taskname: taskname, status: status})
+        }
+        console.log("TASKS!!", tasks)
+        return tasks
+    }
+}
+
+async function fetchGroupTasks(groupname) {
+    if (browser) {
+        const res = await fetch(`http://localhost:3000/groups/${groupname}`, {
+            method: 'GET', headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        const groups = await res.json()
+        if (res.ok) {
+            return groups
+        } else {
+            throw new Error(await res.text())
+        }
+    }
+}

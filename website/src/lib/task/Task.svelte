@@ -5,7 +5,7 @@
 </script>
 
 <div>
-    <p><strong>{task.taskname}</strong>: {task.task}</p>
+    <p><strong>Task {task.taskname}</strong>: {task.task}</p>
     <DeleteTask taskname={task.taskname} />
 </div>
 

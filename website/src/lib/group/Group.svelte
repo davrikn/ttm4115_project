@@ -6,8 +6,7 @@
 <div class="box">
 	<a href="/group/{name}">
 		<h3>Group: {name}</h3>
-		<h4>Task 1/{tasks.length}</h4>
-		<h4>Needs help: No</h4>
+		<h4>Progress: Task </h4>
 	</a>
 </div>
 
