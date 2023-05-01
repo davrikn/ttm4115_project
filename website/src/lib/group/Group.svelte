@@ -25,5 +25,6 @@
         box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
         padding: 1em 4em 1em 4em;
         margin: 1em;
+        background: white;
     }
 </style>

@@ -29,8 +29,9 @@
 </script>
 
 <form>
+    <h2>Create a new group</h2>
 <label for="new-group">
-    New group name:
+    Groupname:
 </label>
 <input bind:value={groupname} type="text" name="new-group" id="new-group">
 <button on:click={createNewGroup}>Create new group</button>
@@ -46,6 +47,8 @@
         box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
         padding: 1em 4em 1em 4em;
         margin: 1em;
+        height: max-content;
+        max-height: max-content;
 
         display: flex;
         flex-direction: column;

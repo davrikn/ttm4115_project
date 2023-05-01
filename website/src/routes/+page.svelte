@@ -7,14 +7,29 @@
 <slot/>
 
 <div class="wrapper">
-    <NewGroup/>
+    <div class="row"><NewGroup/> <StatusBar/>
+    </div>
+    <div class="groups">
     <AllGroups/>
-
-    <StatusBar/>
+    </div>
 </div>
 
 <style>
     .wrapper {
-        margin: 1em;
+    }
+    .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+    }
+
+    .groups {
+        width: 100%;
+        margin: 0;
+        padding: 2em !important;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
     }
 </style>

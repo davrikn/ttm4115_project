@@ -13,11 +13,9 @@
     div {
         display: flex;
         flex-direction: row;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
         gap: 2em;
-        margin: 2em;
-        height: 100%;
 
         box-sizing: border-box;
         width: max-content;
