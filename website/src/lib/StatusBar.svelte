@@ -18,7 +18,6 @@
 
     onMount(() => {
         updateTasks()
-        console.log(updateTasks())
     })
 </script>
 
@@ -30,6 +29,7 @@
     {:else if $groupStore.length === 0}
         <p>No groups found. Please create some groups.</p>
     {:else}
+        <h2 style="text-align: center">Group status</h2>
         <table>
             <thead>
             <tr>

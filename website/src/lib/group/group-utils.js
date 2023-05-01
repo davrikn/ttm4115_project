@@ -1,5 +1,6 @@
 import {browser} from "$app/environment";
 import {groupStore} from "../stores.js";
+import {invalidateAll} from "$app/navigation";
 
 async function fetchGroups() {
     if (browser) {
@@ -77,6 +78,7 @@ export function updateTaskStatus(groupname, taskname, status) {
             finishTask(groupname, taskname)
             break;
     }
+    invalidateAll()
 }
 
 export async function updateGroupTasks(groupname) {
@@ -86,7 +88,7 @@ export async function updateGroupTasks(groupname) {
         for (const [taskname, status] of Object.entries(tasksJSON)) {
             tasks.push({taskname: taskname, status: status})
         }
-        console.log("TASKS!!", tasks)
+
         return tasks
     }
 }

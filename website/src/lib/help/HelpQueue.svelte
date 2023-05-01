@@ -6,23 +6,39 @@
 </script>
 
 <div class="wrapper">
-<h1>Help queue</h1>
-{#await queue}
+    <h1>Help queue</h1>
+    {#await queue}
     {:then helpQueue}
-    <div class="awaiting">
-        <h2>Awaiting: </h2>
-            {#each helpQueue.awaiting as group}
-                <p>{group}</p>
-                <StartHelp groupname={group}/>
-            {/each}
-    </div>
-    <div class="receiving">
-        <h2>Receiving: </h2>
+        <div class="awaiting">
+            <h2>Awaiting: </h2>
+            <table>
+                <tbody>
+                {#each helpQueue.awaiting as group}
+                    <tr>
+                        <th>{group}</th>
+                        <td>
+                            <StartHelp groupname={group}/>
+                        </td>
+                    </tr>
+                {/each}
+                </tbody>
+            </table>
+        </div>
+        <div class="receiving">
+            <h2>Receiving: </h2>
+            <table>
+                <tbody>
             {#each helpQueue.receiving as group}
-                <p>{group}</p>
+                <tr>
+                    <th>{group}</th>
+                    <td>
                 <StopHelp groupname={group}/>
+                    </td>
+                </tr>
             {/each}
-    </div>
+                </tbody>
+            </table>
+        </div>
     {:catch error}
         <p>{error.message}</p>
     {/await}

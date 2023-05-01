@@ -1,7 +1,7 @@
 <script>
     import NewGroup from '$lib/group/NewGroup.svelte';
-    import StatusBar from '$lib/StatusBar.svelte';
     import AllGroups from "$lib/group/AllGroups.svelte";
+    import StatusBar from "$lib/StatusBar.svelte";
 </script>
 
 <slot/>

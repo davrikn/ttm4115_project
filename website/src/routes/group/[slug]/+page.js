@@ -18,7 +18,7 @@ async function updateGroupTasks(groupname) {
         for (const [taskname, status] of Object.entries(tasksJSON)) {
             tasks.push({taskname: taskname, status: status})
         }
-        console.log("TASKS!!", tasks)
+
         return tasks
     }
 }

@@ -133,7 +133,7 @@ def request_help():
 
     driver.send(REQUEST_HELP, 'Helpqueue', [groupname])
     client.client.publish('help/status', str(queue.state()))
-    return f"You are {len(queue.in_help)} in line"
+    return f"You are {len(queue.queue)} in line"
 
 
 @app.route('/help/start', methods=["POST"])

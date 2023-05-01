@@ -9,7 +9,7 @@
 
 <div class="groups">
     {#each $groupStore as group}
-        <Group name={group.name} tasks={group.tasks}/>
+        <Group groupname={group.name} tasks={group.tasks}/>
         {:else}
         <h1>There is no groups on the server.<br>
             Please create new groups.</h1>
