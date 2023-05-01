@@ -1,5 +1,8 @@
 <script>
     import NavBar from "$lib/NavBar.svelte";
+    import { run } from "$lib/mqtt.js"
+
+    run()
 </script>
 
 <NavBar />
