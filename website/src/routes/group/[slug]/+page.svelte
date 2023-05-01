@@ -1,7 +1,7 @@
 <script>
-	import DeleteGroupButton from '$lib/group/DeleteGroupButton.svelte';
 	import TaskViewer from '$lib/task/TaskViewer.svelte';
 	import RequestHelpButton from '$lib/help/RequestHelpButton.svelte';
+	import Members from "$lib/group/member/Members.svelte";
 
 	export let data;
 </script>
@@ -11,9 +11,9 @@
 		<h1>Group: {data.slug}</h1>
 		<div class="buttons">
 			<RequestHelpButton name={data.slug} />
-			<DeleteGroupButton name={data.slug} />
 		</div>
 	</div>
+	<Members groupname={data.slug} groupmembers={data.groupmembers}/>
 	<TaskViewer tasks={data.tasks} groupname={data.slug} />
 </div>
 

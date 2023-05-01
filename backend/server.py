@@ -186,6 +186,12 @@ def create_group():
         driver.send(ASSIGN_TASK, ASSIGN_TASK, [task])
     return f"Group {groupname} successfully created", 200
 
+@app.route("/groups/<groupname>/members", methods=["GET"])
+def get_groupmembers(groupname):
+    if groupname not in groups.keys():
+        return f"Group {groupname} not found", 404
+    return groups[groupname].members, 200
+
 
 @app.route("/groups/<groupname>/members", methods=["POST"])
 @jwt_required()
