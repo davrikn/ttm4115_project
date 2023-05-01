@@ -72,7 +72,7 @@ class HelpQueueState:
             self.stm.send(QUEUE_NOT_EMPTY)
 
     def state(self):
-        return {"receiving": self.in_help, "awaiting": self.queue}
+        return {"receiving": self.in_help, 'awaiting': self.queue}
 
     def __str__(self):
         return "Currently queue length: {}".format(len(self.queue))
