@@ -24,7 +24,7 @@ export async function updateGroups() {
         const groupsJSON = await fetchGroups()
         const groups = []
         for (const [name, tasks] of Object.entries(groupsJSON)) {
-            groups.push({name: name, tasks: tasks})
+            groups.push({name: name, tasks: JSON.parse(tasks)})
         }
         groupStore.set(groups)
         return groups
