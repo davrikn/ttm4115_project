@@ -34,5 +34,6 @@
         gap: 2em;
         margin: 2em;
         height: 100%;
+        width: 100%;
     }
 </style>

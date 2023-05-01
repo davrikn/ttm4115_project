@@ -1,5 +1,8 @@
 import mqtt_client from 'u8-mqtt'
 import {browser} from "$app/environment";
+import {invalidateAll} from "$app/navigation";
+import {updateGroups} from "$lib/group/group-utils.js";
+import {updateTasks} from "$lib/task/task-utils.js";
 
 
 export async function run() {
@@ -11,14 +14,32 @@ export async function run() {
         await my_mqtt.connect()
 
         my_mqtt.subscribe_topic(
-            'group/*/status',
+            'groups/*/status',
             (pkt, params, ctx) => {
-                console.log('topic packet', params, pkt, pkt.json())
+                console.log('Group status')
+                updateGroups()
+                updateTasks()
             })
 
-        await my_mqtt.json_send(
-            'group/group1/status',
-            { note: 'from README example',
-                live: new Date().toISOString() })
+        my_mqtt.subscribe_topic(
+            'help/status',
+            (pkt, params, ctx) => {
+                console.log('help status')
+                invalidateAll()
+            })
+
+        my_mqtt.subscribe_topic(
+            'groupCreated',
+            (pkt, params, ctx) => {
+                console.log('groupCreated')
+                updateGroups()
+            })
+
+        my_mqtt.subscribe_topic(
+            'groupCreated',
+            (pkt, params, ctx) => {
+                console.log('groupCreated')
+                updateGroups()
+            })
     }
 }
