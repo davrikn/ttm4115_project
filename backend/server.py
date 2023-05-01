@@ -23,7 +23,7 @@ queue = HelpQueueState(driver)
 client = get()
 
 groups = dict()
-tasks = {"T1": "Example task"}
+tasks = dict()
 users = {
     "David": {"password": "David123!"},
     "Ola": {"password": "Ola123!"},
@@ -183,7 +183,7 @@ def create_group():
     group = GroupState(groupname, driver)
     groups[groupname] = group
     for task in tasks.keys():
-        driver.send(ASSIGN_TASK, ASSIGN_TASK, [task])
+        driver.send(ASSIGN_TASK, groupname, [task])
     return f"Group {groupname} successfully created", 200
 
 @app.route("/groups/<groupname>/members", methods=["GET"])
