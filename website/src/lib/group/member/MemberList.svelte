@@ -1,16 +1,27 @@
 <script>
+    import RemoveMember from "$lib/group/member/RemoveMember.svelte";
+
+    export let groupname;
     export let groupmembers;
 </script>
 
-<div>
-    <h4>Members:</h4>
-    {#each groupmembers as member}
-        <p>{member.username}</p>
-    {/each}
+<div class="wrapper">
+    <h3>Members:</h3>
+    <table>
+        <tbody>
+        {#each groupmembers as member}
+            <tr>
+                <td>{member.username}</td>
+                <td>
+                    <RemoveMember groupname={groupname} username={member.username}/>
+                </td>
+        {/each}
+        </tbody>
+    </table>
 </div>
 
 <style>
-    div {
+    .wrapper {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -25,9 +36,5 @@
         box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
         padding: 1em 4em 1em 4em;
         max-width: 70%;
-    }
-
-    p {
-        margin: 5px;
     }
 </style>

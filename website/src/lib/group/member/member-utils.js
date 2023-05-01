@@ -37,6 +37,7 @@ export function removeGroupmember(groupname, username) {
             .then((response) => response.text())
             .then((text) => {
                 alert(text)
+                invalidateAll()
             })
             .catch((err) => {
                 alert(err);

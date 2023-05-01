@@ -8,7 +8,7 @@ export let groupmembers;
 
 <div>
 <AddMember groupname={groupname}/>
-<MemberList groupmembers={groupmembers} />
+<MemberList groupname={groupname} groupmembers={groupmembers} />
 </div>
 
 <style>

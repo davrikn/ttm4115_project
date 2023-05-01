@@ -6,7 +6,7 @@
 </script>
 
 
-<button on:click={() => removeGroupmember(groupname, username)}>Remove {username}</button>
+<button on:click={() => removeGroupmember(groupname, username)}>Remove member</button>
 
 <style>
     button {
