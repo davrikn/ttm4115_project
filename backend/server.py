@@ -85,7 +85,7 @@ def start_task(groupname, taskname):
 
     driver.send(START_TASK, groupname, [taskname])
     sleep(0.01)
-    client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
+    client.client.publish(f"groups/{groupname}/status", str(groups[groupname].state()))
     return "Task started", 200
 
 
@@ -106,7 +106,7 @@ def finish_task(groupname, taskname):
 
     driver.send(COMPLETE_TASK, groupname, [taskname])
     sleep(0.01)
-    client.client.publish(f"groups/{groupname}/status", str(groups[groupname].status()))
+    client.client.publish(f"groups/{groupname}/status", str(groups[groupname].state()))
     return "Task finished", 200
 
 
@@ -245,7 +245,7 @@ def add_task():
     for group in groups.keys():
         driver.send(ASSIGN_TASK, group, [taskname])
         sleep(0.001)
-        client.client.publish(f"groups/{group}/status", str(groups[group].status()))
+        client.client.publish(f"groups/{group}/status", str(groups[group].state()))
     return f"Task {taskname} added"
 
 
@@ -261,7 +261,7 @@ def remove_task(taskname):
     for group in groups.keys():
         driver.send(DELETE_TASK, group, [taskname])
         sleep(0.001)
-        client.client.publish(f"groups/{group}/status", str(groups[group].status()))
+        client.client.publish(f"groups/{group}/status", str(groups[group].state()))
     return f"Task {taskname} removed"
 
 
